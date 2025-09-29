@@ -45,7 +45,7 @@ export default function UploadFile() {
 
 
   return (
-    <div className="flex mx-4 my-3 gap-2">
+    <div className="flex mx-4 my-3 gap-2 items-center justify-center">
       <input
         type="file"
         className="file-input file-input-neutral"

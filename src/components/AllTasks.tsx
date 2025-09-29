@@ -4,7 +4,7 @@ type Task = {
   id: number;
   text_id: number;
   assigned_to: number;
-  assigned_to_name: string; 
+  assigned_to_name: string;
   title: string;
   description: string;
   status: string;
@@ -40,9 +40,9 @@ export default function AllTasks() {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 flex flex-col justify-center items-center">
       <button
-        className="btn btn-wide"
+        className="btn btn-wide flex justify-center items-center"
         onClick={handleClick}
         disabled={loading}
       >
@@ -51,7 +51,7 @@ export default function AllTasks() {
 
       {showTasks && (
         <div className="mt-4">
-          <h2 className="text-xl font-bold mb-4">Tasks</h2>
+          <h2 className="text-xl font-bold mb-4 flex justify-center">Tasks</h2>
           {error && <p className="text-red-500">{error}</p>}
           {!error && tasks.length === 0 && !loading && (
             <p>No tasks found.</p>
@@ -60,7 +60,9 @@ export default function AllTasks() {
             {tasks.map((task) => (
               <div
                 key={task.id}
-                className="border rounded-lg p-3 shadow-sm bg-base-100"
+                className="border rounded-lg p-3 shadow-sm bg-base-100
+                           transition-all duration-200
+                           hover:shadow-md hover:bg-base-200 hover:scale-[1.01]"
               >
                 <h3 className="font-semibold">{task.title}</h3>
                 <p className="text-sm text-gray-600">{task.description}</p>
@@ -70,8 +72,8 @@ export default function AllTasks() {
                   </span>
                   <span>
                     Assigned To:{" "}
-                    <strong>{task.assigned_to_name}</strong> (
-                    ID: {task.assigned_to})
+                    <strong>{task.assigned_to_name}</strong> (ID:{" "}
+                    {task.assigned_to})
                   </span>
                 </div>
               </div>
