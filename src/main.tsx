@@ -2,9 +2,23 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
+import { createBrowserRouter } from "react-router";
+import { RouterProvider } from "react-router/dom";
+import TasksByEmailPage from './components/TaskByEmailPage.tsx';
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />
+  },
+  {
+    path: "/tasks/email/:email",
+    element: <TasksByEmailPage />,
+  },
+])
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <RouterProvider router={router} />,
   </StrictMode>,
 )
