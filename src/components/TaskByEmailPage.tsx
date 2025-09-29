@@ -8,7 +8,7 @@ interface Task {
   description: string | null;
   status: string;
   due_date: string | null;
-  assigned_to_name: string; // get the name from backend
+  assigned_to_name: string;
   created_at: string;
   updated_at: string;
 }
@@ -24,6 +24,15 @@ export default function TasksByEmailPage() {
     if (!email) return;
 
     setLoading(true);
+    const storedTasks = localStorage.getItem(`tasks_${email}`);
+    if (storedTasks) {
+      const parsed = JSON.parse(storedTasks) as Task[];
+      setTasks(parsed);
+      setUsername(parsed[0]?.assigned_to_name ?? "User");
+      setLoading(false);
+      return;
+    }
+
     fetch(`http://localhost:8000/task/email/${email}`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
@@ -31,14 +40,34 @@ export default function TasksByEmailPage() {
       })
       .then(data => {
         setTasks(data);
-        setUsername(data[0]?.assigned_to_name ?? "User"); // get username from first task
+        setUsername(data[0]?.assigned_to_name ?? "User");
         setLoading(false);
+        localStorage.setItem(`tasks_${email}`, JSON.stringify(data));
       })
       .catch(err => {
         setError(err.message);
         setLoading(false);
       });
   }, [email]);
+
+  const toggleStatus = (id: number) => {
+    setTasks(prev =>
+      prev.map(task =>
+        task.id === id
+          ? { ...task, status: task.status === "completed" ? "pending" : "completed" }
+          : task
+      )
+    );
+
+    // Update localStorage
+    localStorage.setItem(`tasks_${email}`, JSON.stringify(
+      tasks.map(task =>
+        task.id === id
+          ? { ...task, status: task.status === "completed" ? "pending" : "completed" }
+          : task
+      )
+    ));
+  };
 
   if (loading) return <div className="text-center mt-10">Loading tasks...</div>;
   if (error) return <div className="text-center mt-10 text-red-600">Error: {error}</div>;
@@ -58,8 +87,19 @@ export default function TasksByEmailPage() {
           >
             <h3 className="text-lg font-bold mb-2">{task.title}</h3>
             <p className="text-gray-700 mb-2">{task.description ?? "No description"}</p>
-            <div className="text-sm text-gray-500 mb-1">
-              Status: <span className={`font-semibold ${task.status === "completed" ? "text-green-600" : "text-yellow-600"}`}>{task.status}</span>
+            <div className="flex items-center justify-between text-sm text-gray-500 mb-1">
+              <span>
+                Status:{" "}
+                <span className={`font-semibold ${task.status === "completed" ? "text-green-600" : "text-yellow-600"}`}>
+                  {task.status}
+                </span>
+              </span>
+              <button
+                className="ml-2 px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300"
+                onClick={() => toggleStatus(task.id)}
+              >
+                Toggle
+              </button>
             </div>
             <div className="text-sm text-gray-500">
               Due: {task.due_date ? new Date(task.due_date).toLocaleDateString() : "N/A"}
